@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>US State Capitals Quiz</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; line-height: 1.6; max-width: 800px; margin: auto; }
+        .question { margin-bottom: 20px; border: 1px solid #ddd; padding: 15px; border-radius: 8px; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>US State Capitals Quiz</h1>
+    <div id="quiz-container"></div>
+    <button onclick="checkAnswers()">Submit Quiz</button>
+    <button onclick="downloadPDF()">Download as PDF</button>
+    <button onclick="downloadQTI()">Download as QTI</button>
+
+    <script>
+        const quizData = [
+            { q: "What is the capital of California?", options: ["Los Angeles", "Sacramento", "San Francisco", "San Diego"], correct: 1 },
+            { q: "Which city is the capital of New York?", options: ["New York City", "Buffalo", "Albany", "Syracuse"], correct: 2 },
+            { q: "What is the capital of Texas?", options: ["Houston", "Austin", "Dallas", "San Antonio"], correct: 1 },
+            { q: "Which of these cities is the capital of Florida?", options: ["Miami", "Orlando", "Tallahassee", "Jacksonville"], correct: 2 },
+            { q: "What is the capital of Washington?", options: ["Seattle", "Olympia", "Spokane", "Tacoma"], correct: 1 },
+            { q: "Match: 1. Colorado, 2. Arizona to A. Denver, B. Phoenix", options: ["1-A, 2-B", "1-B, 2-A"], correct: 0 },
+            { q: "Match: 1. Georgia, 2. Massachusetts to A. Boston, B. Atlanta", options: ["1-A, 2-B", "1-B, 2-A"], correct: 1 },
+            { q: "Fill in the blank: The capital of Illinois is...", options: ["Springfield", "Chicago"], correct: 0 },
+            { q: "Essay: Why does a state have a capital city?", options: ["Government center", "Largest city"], correct: 0 },
+            { q: "True or False: Every US state capital is the largest city in its state.", options: ["True", "False"], correct: 1 }
+        ];
+
+        const container = document.getElementById('quiz-container');
+        quizData.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'question';
+            div.innerHTML = `<p>${index + 1}. ${item.q}</p>` + 
+                item.options.map((opt, i) => `<label><input type="radio" name="q${index}" value="${i}"> ${opt}</label><br>`).join('');
+            container.appendChild(div);
+        });
+
+        function checkAnswers() { alert("Quiz submitted! (Logic would go here)"); }
+        function downloadPDF() { alert("Simulated PDF download."); }
+        function downloadQTI() { alert("Simulated QTI download."); }
+    </script>
+</body>
+</html>
