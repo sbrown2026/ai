@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson Prompt Generator</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+ 
+  :root {
+    --ink: #1a1a2e;
+    --chalk: #f5f2ec;
+    --accent: #2e6da4;
+    --accent-light: #d6e8f7;
+    --highlight: #e8a020;
+    --border: #d0cdc5;
+    --muted: #6b6860;
+    --success: #2a7a4b;
+    --card: #ffffff;
+    --tag-bg: #eaf3fb;
+  }
+ 
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+  body {
+    background: var(--chalk);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+ 
+  header {
+    background: var(--ink);
+    color: white;
+    padding: 28px 40px 24px;
+    border-bottom: 4px solid var(--highlight);
+  }
+ 
+  header .eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--highlight);
+    margin-bottom: 6px;
+  }
+ 
+  header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+ 
+  header p {
+    font-size: 13px;
+    color: #a8a8b8;
+    margin-top: 6px;
+  }
+ 
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr 420px;
+    gap: 0;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 32px 24px;
+    align-items: start;
+  }
+ 
+  .form-panel {
+    padding-right: 32px;
+  }
+ 
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+    margin-top: 28px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+ 
+  .section-label:first-child { margin-top: 0; }
+ 
+  .field { margin-bottom: 16px; }
+ 
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 5px;
+  }
+ 
+  input[type="text"],
+  textarea,
+  select {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    background: var(--card);
+    transition: border-color 0.15s;
+    outline: none;
+  }
+ 
+  input[type="text"]:focus,
+  textarea:focus,
+  select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-light);
+  }
+ 
+  textarea { resize: vertical; min-height: 72px; }
+ 
+  .hint {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+ 
+  /* Activity checkboxes */
+  .activity-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+ 
+  .activity-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: var(--card);
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    user-select: none;
+  }
+ 
+  .activity-card:hover { border-color: var(--accent); background: var(--accent-light); }
+ 
+  .activity-card input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--accent);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+ 
+  .activity-card.checked {
+    border-color: var(--accent);
+    background: var(--accent-light);
+  }
+ 
+  .activity-card .act-label {
+    font-size: 13px;
+    font-weight: 500;
+  }
+ 
+  .activity-card .act-icon { font-size: 16px; }
+ 
+  /* Toggle options */
+  .toggle-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+ 
+  .toggle-pill {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    background: var(--card);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+ 
+  .toggle-pill:hover { border-color: var(--accent); }
+  .toggle-pill.selected { background: var(--accent); border-color: var(--accent); color: white; }
+ 
+  /* ADA toggle */
+  .ada-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+  }
+ 
+  .ada-row .ada-info { font-size: 13px; font-weight: 500; }
+  .ada-row .ada-sub { font-size: 11px; color: var(--muted); }
+ 
+  .switch {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    flex-shrink: 0;
+  }
+ 
+  .switch input { opacity: 0; width: 0; height: 0; }
+ 
+  .slider {
+    position: absolute;
+    inset: 0;
+    background: #ccc;
+    border-radius: 24px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+ 
+  .slider::before {
+    content: '';
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    left: 3px;
+    top: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.2s;
+  }
+ 
+  .switch input:checked + .slider { background: var(--accent); }
+  .switch input:checked + .slider::before { transform: translateX(20px); }
+  .switch input:focus + .slider { box-shadow: 0 0 0 3px var(--accent-light); }
+ 
+  /* Generate button */
+  .generate-btn {
+    width: 100%;
+    margin-top: 28px;
+    padding: 14px 20px;
+    background: var(--ink);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.01em;
+    transition: background 0.15s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+ 
+  .generate-btn:hover { background: #2c2c4a; }
+  .generate-btn:active { transform: scale(0.99); }
+ 
+  /* Output panel */
+  .output-panel {
+    position: sticky;
+    top: 24px;
+  }
+ 
+  .output-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  }
+ 
+  .output-header {
+    background: var(--ink);
+    color: white;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+ 
+  .output-header .out-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.05rem;
+    font-weight: 400;
+  }
+ 
+  .output-header .platform-tag {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--highlight);
+  }
+ 
+  .output-body {
+    padding: 18px;
+    min-height: 200px;
+  }
+ 
+  #promptOutput {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.75;
+    color: var(--ink);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+ 
+  .placeholder-text {
+    color: var(--muted);
+    font-size: 13px;
+    font-style: italic;
+    text-align: center;
+    padding: 40px 20px;
+  }
+ 
+  .placeholder-text .big-icon { font-size: 36px; display: block; margin-bottom: 10px; }
+ 
+  .output-footer {
+    padding: 12px 18px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+ 
+  .copy-btn {
+    flex: 1;
+    padding: 10px 16px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+ 
+  .copy-btn:hover { background: #255e92; }
+  .copy-btn.copied { background: var(--success); }
+ 
+  .clear-btn {
+    padding: 10px 16px;
+    background: transparent;
+    color: var(--muted);
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+ 
+  .clear-btn:hover { border-color: #c0392b; color: #c0392b; }
+ 
+  .word-count {
+    font-size: 11px;
+    color: var(--muted);
+    text-align: right;
+    padding: 6px 18px 8px;
+    border-top: 1px solid var(--border);
+  }
+ 
+  /* Platform quick tips */
+  .platform-tips {
+    margin-top: 16px;
+    padding: 14px 16px;
+    background: var(--tag-bg);
+    border-radius: 8px;
+    border-left: 3px solid var(--accent);
+  }
+ 
+  .platform-tips .tip-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+ 
+  .platform-tips p { font-size: 12px; color: var(--muted); line-height: 1.5; }
+ 
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; padding: 20px 16px; }
+    .form-panel { padding-right: 0; }
+    .output-panel { position: static; margin-top: 24px; }
+    .activity-grid { grid-template-columns: 1fr; }
+    header { padding: 20px 20px 16px; }
+  }
+</style>
+</head>
+<body>
+ 
+<header>
+  <div class="eyebrow">Community College Faculty Tool</div>
+  <h1>Lesson Prompt Generator</h1>
+  <p>Fill in your lesson details to build a ready-to-paste AI prompt for any platform.</p>
+</header>
+ 
+<div class="layout">
+  <!-- FORM PANEL -->
+  <div class="form-panel">
+ 
+    <div class="section-label">Lesson Basics</div>
+ 
+    <div class="field">
+      <label for="lessonTitle">Lesson Title <span style="color:#c0392b">*</span></label>
+      <input type="text" id="lessonTitle" placeholder="e.g., Introduction to the Scientific Method" oninput="liveUpdate()">
+    </div>
+ 
+    <div class="field">
+      <label for="topics">Topics Covered</label>
+      <textarea id="topics" placeholder="List the main topics this lesson addresses, one per line or comma-separated." oninput="liveUpdate()"></textarea>
+    </div>
+ 
+    <div class="field">
+      <label for="objectives">Learning Objectives</label>
+      <textarea id="objectives" placeholder="By the end of this lesson, students will be able to..." oninput="liveUpdate()"></textarea>
+      <div class="hint">Use Bloom's Taxonomy action verbs: identify, analyze, apply, evaluate…</div>
+    </div>
+ 
+    <div class="field">
+      <label for="keyTerms">Key Terms / Vocabulary</label>
+      <input type="text" id="keyTerms" placeholder="e.g., hypothesis, variable, control group" oninput="liveUpdate()">
+    </div>
+ 
+    <div class="section-label">Audience</div>
+ 
+    <div class="field">
+      <label>Course Level</label>
+      <div class="toggle-row" id="levelGroup">
+        <span class="toggle-pill" data-group="level" onclick="selectPill(this)">100-Level (Introductory)</span>
+        <span class="toggle-pill" data-group="level" onclick="selectPill(this)">200-Level (Intermediate)</span>
+        <span class="toggle-pill" data-group="level" onclick="selectPill(this)">Transfer-Level</span>
+        <span class="toggle-pill" data-group="level" onclick="selectPill(this)">Vocational / CTE</span>
+      </div>
+    </div>
+ 
+    <div class="field">
+      <label for="audience">Additional Audience Notes</label>
+      <input type="text" id="audience" placeholder="e.g., First-generation students, mixed skill levels, ESL learners" oninput="liveUpdate()">
+    </div>
+ 
+    <div class="section-label">Instructional Activities</div>
+ 
+    <div class="activity-grid" id="activityGrid">
+      <label class="activity-card" id="card-interactive">
+        <input type="checkbox" value="Interactive Learning" onchange="toggleCard(this); liveUpdate()">
+        <span class="act-icon">🎮</span>
+        <span class="act-label">Interactive Learning</span>
+      </label>
+      <label class="activity-card" id="card-case">
+        <input type="checkbox" value="Case Studies" onchange="toggleCard(this); liveUpdate()">
+        <span class="act-icon">📂</span>
+        <span class="act-label">Case Studies</span>
+      </label>
+      <label class="activity-card" id="card-team">
+        <input type="checkbox" value="Team Projects" onchange="toggleCard(this); liveUpdate()">
+        <span class="act-icon">👥</span>
+        <span class="act-label">Team Projects</span>
+      </label>
+      <label class="activity-card" id="card-labs">
+        <input type="checkbox" value="Labs" onchange="toggleCard(this); liveUpdate()">
+        <span class="act-icon">🔬</span>
+        <span class="act-label">Labs</span>
+      </label>
+      <label class="activity-card" id="card-assessments">
+        <input type="checkbox" value="Assessments" onchange="toggleCard(this); liveUpdate()">
+        <span class="act-icon">📝</span>
+        <span class="act-label">Assessments</span>
+      </label>
+    </div>
+ 
+    <div class="section-label">Design Considerations</div>
+ 
+    <div class="field">
+      <div class="ada-row">
+        <div>
+          <div class="ada-info">ADA Compliance</div>
+          <div class="ada-sub">Include accessibility accommodations in the lesson design</div>
+        </div>
+        <label class="switch" aria-label="Enable ADA compliance">
+          <input type="checkbox" id="adaToggle" onchange="liveUpdate()">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+ 
+    <div class="field">
+      <label>Analogies &amp; Real-World Examples</label>
+      <div class="toggle-row" id="analogyGroup">
+        <span class="toggle-pill" data-group="analogy" onclick="selectPill(this)">None needed</span>
+        <span class="toggle-pill" data-group="analogy" onclick="selectPill(this)">Include analogies only</span>
+        <span class="toggle-pill" data-group="analogy" onclick="selectPill(this)">Include real-world examples only</span>
+        <span class="toggle-pill selected" data-group="analogy" onclick="selectPill(this)">Include both</span>
+      </div>
+    </div>
+ 
+    <div class="field">
+      <label for="extra">Additional Instructions (optional)</label>
+      <textarea id="extra" placeholder="Any other specific requirements, tone preferences, or constraints for this lesson…" oninput="liveUpdate()"></textarea>
+    </div>
+ 
+    <button class="generate-btn" onclick="generatePrompt()">
+      ✦ Generate Prompt
+    </button>
+ 
+  </div>
+ 
+  <!-- OUTPUT PANEL -->
+  <div class="output-panel">
+    <div class="output-card">
+      <div class="output-header">
+        <span class="out-title">Your AI Prompt</span>
+        <span class="platform-tag">Ready to copy</span>
+      </div>
+      <div class="output-body">
+        <div id="promptPlaceholder" class="placeholder-text">
+          <span class="big-icon">📋</span>
+          Fill in your lesson details and click<br><strong>Generate Prompt</strong> to build your prompt.
+        </div>
+        <div id="promptOutput" style="display:none"></div>
+      </div>
+      <div class="word-count" id="wordCount" style="display:none"></div>
+      <div class="output-footer" id="outputFooter" style="display:none">
+        <button class="copy-btn" id="copyBtn" onclick="copyPrompt()">
+          📋 Copy to Clipboard
+        </button>
+        <button class="clear-btn" onclick="clearForm()">Clear</button>
+      </div>
+    </div>
+ 
+    <div class="platform-tips">
+      <div class="tip-label">Where to use this prompt</div>
+      <p>Paste directly into <strong>ChatGPT</strong>, <strong>Claude</strong>, <strong>Gemini</strong>, <strong>Copilot</strong>, or any AI assistant. Works with LMS tools like <strong>Packback</strong> or <strong>Khanmigo</strong> that support custom prompts.</p>
+    </div>
+  </div>
+</div>
+ 
+<script>
+  function selectPill(el) {
+    const group = el.dataset.group;
+    document.querySelectorAll(`.toggle-pill[data-group="${group}"]`).forEach(p => p.classList.remove('selected'));
+    el.classList.add('selected');
+    liveUpdate();
+  }
+ 
+  function toggleCard(checkbox) {
+    const card = checkbox.closest('.activity-card');
+    card.classList.toggle('checked', checkbox.checked);
+  }
+ 
+  function getSelectedPill(group) {
+    const el = document.querySelector(`.toggle-pill[data-group="${group}"].selected`);
+    return el ? el.textContent.trim() : null;
+  }
+ 
+  function getCheckedActivities() {
+    return Array.from(document.querySelectorAll('#activityGrid input[type="checkbox"]:checked'))
+      .map(cb => cb.value);
+  }
+ 
+  function liveUpdate() {
+    // silently keep output fresh if already generated
+    const out = document.getElementById('promptOutput');
+    if (out.style.display !== 'none') generatePrompt(true);
+  }
+ 
+  function generatePrompt(silent = false) {
+    const title     = document.getElementById('lessonTitle').value.trim();
+    const topics    = document.getElementById('topics').value.trim();
+    const objectives= document.getElementById('objectives').value.trim();
+    const keyTerms  = document.getElementById('keyTerms').value.trim();
+    const audience  = document.getElementById('audience').value.trim();
+    const extra     = document.getElementById('extra').value.trim();
+    const ada       = document.getElementById('adaToggle').checked;
+    const level     = getSelectedPill('level');
+    const analogy   = getSelectedPill('analogy');
+    const activities = getCheckedActivities();
+ 
+    if (!title && !silent) {
+      document.getElementById('lessonTitle').focus();
+      document.getElementById('lessonTitle').style.borderColor = '#c0392b';
+      setTimeout(() => document.getElementById('lessonTitle').style.borderColor = '', 2000);
+      return;
+    }
+ 
+    let prompt = `You are an experienced community college instructor designing a complete, classroom-ready lesson plan. Please create a detailed lesson plan using the specifications below.\n\n`;
+ 
+    prompt += `═══════════════════════════════════════\nLESSON DETAILS\n═══════════════════════════════════════\n\n`;
+ 
+    if (title) prompt += `LESSON TITLE:\n${title}\n\n`;
+ 
+    if (level) prompt += `COURSE LEVEL:\n${level}\n\n`;
+ 
+    if (topics) {
+      prompt += `TOPICS COVERED:\n${topics}\n\n`;
+    }
+ 
+    if (objectives) {
+      prompt += `LEARNING OBJECTIVES:\nBy the end of this lesson, students will be able to:\n${objectives}\n\n`;
+    }
+ 
+    if (keyTerms) {
+      prompt += `KEY TERMS / VOCABULARY:\n${keyTerms}\n\n`;
+    }
+ 
+    if (audience) {
+      prompt += `STUDENT AUDIENCE NOTES:\n${audience}\n\n`;
+    }
+ 
+    if (activities.length > 0) {
+      prompt += `INSTRUCTIONAL ACTIVITY TYPES:\n${activities.map(a => `• ${a}`).join('\n')}\n\n`;
+    }
+ 
+    if (ada) {
+      prompt += `ADA COMPLIANCE:\nThis lesson must include explicit ADA-compliant design elements. Address the following:\n• Visual accommodations (alt text for images, sufficient color contrast, captioned video)\n• Auditory accommodations (transcripts, visual cues alongside audio)\n• Motor/physical accommodations (keyboard-navigable digital activities, alternative participation options)\n• Cognitive accommodations (clear instructions, chunked content, multiple means of representation)\n• Note which parts of the lesson may need instructor modification for students with documented disabilities.\n\n`;
+    }
+ 
+    if (analogy && analogy !== 'None needed') {
+      if (analogy === 'Include analogies only') {
+        prompt += `ANALOGIES:\nIncorporate at least 2 clear, relatable analogies to help students connect abstract concepts to prior knowledge. Analogies should be culturally inclusive and relevant to a diverse community college audience.\n\n`;
+      } else if (analogy === 'Include real-world examples only') {
+        prompt += `REAL-WORLD EXAMPLES:\nIncorporate at least 2–3 concrete real-world examples drawn from everyday life, current events, or career contexts relevant to this lesson's subject matter.\n\n`;
+      } else {
+        prompt += `ANALOGIES & REAL-WORLD EXAMPLES:\nIncorporate at least 2 well-chosen analogies to bridge abstract concepts to student experience, plus 2–3 concrete real-world examples from everyday life, current events, or career contexts. Ensure examples reflect the diversity of a community college student population.\n\n`;
+      }
+    }
+ 
+    if (extra) {
+      prompt += `ADDITIONAL INSTRUCTIONS:\n${extra}\n\n`;
+    }
+ 
+    prompt += `═══════════════════════════════════════\nOUTPUT FORMAT\n═══════════════════════════════════════\n\nPlease structure your response as a complete lesson plan that includes:\n\n1. LESSON OVERVIEW (2–3 sentences summarizing the lesson's purpose and value)\n\n2. MATERIALS & PREPARATION (what the instructor needs before class)\n\n3. LESSON OUTLINE with time estimates:\n   • Opening / Hook (engage students, activate prior knowledge)\n   • Direct Instruction (introduce core concepts and key terms)\n   • Guided Practice (instructor-led application)\n   • Activity Section (based on the specified activity types above)\n   • Closing / Synthesis (recap, connections, preview next lesson)\n\n4. ASSESSMENT STRATEGY (how learning objectives are measured)\n\n5. DIFFERENTIATION NOTES (modifications for varying skill levels)`;
+ 
+    if (ada) prompt += `\n\n6. ADA ACCOMMODATIONS CHECKLIST (specific to this lesson's content)`;
+ 
+    prompt += `\n\nKeep the tone practical and collegial — write as one faculty member sharing a well-tested lesson design with another.`;
+ 
+    const out = document.getElementById('promptOutput');
+    const placeholder = document.getElementById('promptPlaceholder');
+    const footer = document.getElementById('outputFooter');
+    const wc = document.getElementById('wordCount');
+ 
+    out.textContent = prompt;
+    out.style.display = 'block';
+    placeholder.style.display = 'none';
+    footer.style.display = 'flex';
+ 
+    const words = prompt.trim().split(/\s+/).length;
+    wc.textContent = `${words} words · ${prompt.length} characters`;
+    wc.style.display = 'block';
+ 
+    document.getElementById('copyBtn').textContent = '📋 Copy to Clipboard';
+    document.getElementById('copyBtn').classList.remove('copied');
+  }
+ 
+  function copyPrompt() {
+    const text = document.getElementById('promptOutput').textContent;
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = '✅ Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = '📋 Copy to Clipboard';
+        btn.classList.remove('copied');
+      }, 2500);
+    });
+  }
+ 
+  function clearForm() {
+    document.getElementById('lessonTitle').value = '';
+    document.getElementById('topics').value = '';
+    document.getElementById('objectives').value = '';
+    document.getElementById('keyTerms').value = '';
+    document.getElementById('audience').value = '';
+    document.getElementById('extra').value = '';
+    document.getElementById('adaToggle').checked = false;
+ 
+    document.querySelectorAll('.toggle-pill').forEach(p => p.classList.remove('selected'));
+    document.querySelectorAll('#activityGrid input[type="checkbox"]').forEach(cb => {
+      cb.checked = false;
+      cb.closest('.activity-card').classList.remove('checked');
+    });
+ 
+    // Re-select defaults
+    document.querySelector('.toggle-pill[data-group="analogy"]:last-child').classList.add('selected');
+ 
+    document.getElementById('promptOutput').style.display = 'none';
+    document.getElementById('promptOutput').textContent = '';
+    document.getElementById('promptPlaceholder').style.display = 'block';
+    document.getElementById('outputFooter').style.display = 'none';
+    document.getElementById('wordCount').style.display = 'none';
+  }
+</script>
+</body>
+</html>
+ 
