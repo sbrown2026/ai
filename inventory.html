@@ -1,0 +1,109 @@
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TCCD Supply Success Journey</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --tccd-blue: #0c2753;
+            --tccd-green: #8dc63f;
+        }
+        .bg-tccd-blue { background-color: var(--tccd-blue); }
+        .text-tccd-blue { color: var(--tccd-blue); }
+        .bg-tccd-green { background-color: var(--tccd-green); }
+        .border-tccd-green { border-color: var(--tccd-green); }
+        
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+
+    <div class="max-w-xl w-full bg-white rounded-2xl shadow-xl overflow-hidden" id="app-container">
+        <!-- Header -->
+        <div class="bg-tccd-blue p-6 text-white text-center">
+            <h1 class="text-2xl font-bold">Supply Success Journey</h1>
+            <p class="text-sm opacity-80 mt-2">Mastering the Request Workflow</p>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="w-full bg-gray-200 h-2">
+            <div id="progress" class="bg-tccd-green h-2 transition-all duration-500" style="width: 25%"></div>
+        </div>
+
+        <!-- Content Area -->
+        <div id="content" class="p-8 fade-in">
+            <!-- Initial content will be injected here via JS -->
+        </div>
+    </div>
+
+    <script>
+        const state = {
+            step: 0,
+            slides: [
+                {
+                    title: "The Goal",
+                    text: "Welcome! Our goal is to get you the supplies you need to support our students as quickly as possible. Following these steps helps our budget stay healthy and ensures we don't buy things we already have in stock.",
+                    options: [{ text: "Start the Journey", action: "next" }]
+                },
+                {
+                    title: "Step 1: Check the Closet",
+                    text: "You notice you're low on printer toner. What is the most efficient first step?",
+                    options: [
+                        { text: "Submit a new purchase request immediately.", action: "wrong" },
+                        { text: "Check internal department inventory/surplus first.", action: "next" }
+                    ]
+                },
+                {
+                    title: "Step 2: The Approval",
+                    text: "Great job checking inventory! Now that you have a list, what is the next critical step before ordering?",
+                    options: [
+                        { text: "Get Manager Approval for the budget impact.", action: "next" },
+                        { text: "Just go ahead and order it; it's a small expense.", action: "wrong" }
+                    ]
+                },
+                {
+                    title: "Success!",
+                    text: "You've mastered the flow! By verifying stock and gaining approval, you save time, reduce waste, and keep our college fiscal records accurate. You're ready to request!",
+                    options: [{ text: "Finish & Return to Work", action: "restart" }]
+                }
+            ]
+        };
+
+        function render() {
+            const contentDiv = document.getElementById('content');
+            const progress = document.getElementById('progress');
+            const slide = state.slides[state.step];
+            
+            progress.style.width = ((state.step + 1) / state.slides.length * 100) + '%';
+            
+            contentDiv.innerHTML = `
+                <h2 class="text-2xl font-bold text-tccd-blue mb-4">${slide.title}</h2>
+                <p class="text-gray-700 mb-6">${slide.text}</p>
+                <div class="space-y-3">
+                    ${slide.options.map(opt => `
+                        <button onclick="${opt.action === 'wrong' ? 'alert(\'Not quite! Let\\\'s try that step again to keep our process efficient.\')' : 'next()'}" 
+                                class="w-full text-left p-4 rounded-lg border-2 border-gray-200 hover:border-tccd-green hover:bg-green-50 transition-all font-medium text-tccd-blue">
+                            ${opt.text}
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function next() {
+            if (state.step < state.slides.length - 1) {
+                state.step++;
+                render();
+            } else {
+                location.reload();
+            }
+        }
+
+        // Initialize App
+        render();
+    </script>
+</body>
+</html>
